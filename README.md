@@ -868,3 +868,462 @@ ldd /path/to/binary     # Show shared library dependencies
 - Remove unused software regularly
 - Check for recommended dependencies during installation
 
+
+
+## Bash Scripting Reference Card
+
+## Basic Script Structure
+
+```bash
+#!/bin/bash
+# This is a comment
+echo "Hello World"
+```
+
+- First line (`#!/bin/bash`) is called the shebang - it tells the system which interpreter to use
+- Make scripts executable with `chmod +x script.sh`
+- Run with `./script.sh` or `bash script.sh`
+
+## Variables
+
+```bash
+# Assignment (no spaces around =)
+name="John"
+age=30
+
+# Access with $
+echo "Name: $name, Age: $age"
+
+# Command substitution
+current_date=$(date)
+files_count=$(ls | wc -l)
+
+# Arithmetic
+result=$((5 + 3))
+```
+
+## Input and Output
+
+```bash
+# User input
+read -p "Enter your name: " user_name
+read -s -p "Enter password: " password  # -s for silent/hidden input
+
+# Output to terminal
+echo "Standard output"
+echo "Error message" >&2  # Write to stderr
+
+# Redirecting output
+ls > file_list.txt        # Redirect stdout to file (overwrite)
+ls >> file_list.txt       # Append stdout to file
+ls 2> errors.txt          # Redirect stderr to file
+ls &> all_output.txt      # Redirect both stdout and stderr
+```
+
+## Conditionals
+
+```bash
+# If statement
+if [ "$name" = "John" ]; then
+    echo "Hello John"
+elif [ "$name" = "Jane" ]; then
+    echo "Hello Jane"
+else
+    echo "Hello stranger"
+fi
+
+# Test command alternatives
+# [ ] is equivalent to test command
+# [[ ]] is enhanced version (Bash-specific)
+
+# String comparisons
+[[ "$str1" == "$str2" ]]  # Equal
+[[ "$str1" != "$str2" ]]  # Not equal
+[[ -z "$str" ]]           # Empty string/null
+[[ -n "$str" ]]           # Not empty string
+
+# Numeric comparisons
+[[ $num1 -eq $num2 ]]     # Equal
+[[ $num1 -ne $num2 ]]     # Not equal
+[[ $num1 -lt $num2 ]]     # Less than
+[[ $num1 -le $num2 ]]     # Less than or equal
+[[ $num1 -gt $num2 ]]     # Greater than
+[[ $num1 -ge $num2 ]]     # Greater than or equal
+
+# File tests
+[[ -e $file ]]            # Exists
+[[ -f $file ]]            # Is a regular file
+[[ -d $file ]]            # Is a directory
+[[ -s $file ]]            # Size greater than zero
+[[ -r $file ]]            # Readable
+[[ -w $file ]]            # Writable
+[[ -x $file ]]            # Executable
+
+# Logical operators
+[[ condition1 && condition2 ]]  # AND
+[[ condition1 || condition2 ]]  # OR
+[[ ! condition ]]               # NOT
+
+# Case statement
+case "$variable" in
+    pattern1)
+        commands1
+        ;;
+    pattern2|pattern3)
+        commands2
+        ;;
+    *)  # Default case
+        default_commands
+        ;;
+esac
+```
+
+## Loops
+
+```bash
+# For loop (list)
+for name in John Jane Alex; do
+    echo "Hello $name"
+done
+
+# For loop (range)
+for i in {1..5}; do
+    echo "Number $i"
+done
+
+# For loop (C-style)
+for ((i=0; i<5; i++)); do
+    echo "Count: $i"
+done
+
+# While loop
+counter=0
+while [ $counter -lt 5 ]; do
+    echo "Counter: $counter"
+    ((counter++))
+done
+
+# Until loop (executes until condition becomes true)
+counter=0
+until [ $counter -ge 5 ]; do
+    echo "Counter: $counter"
+    ((counter++))
+done
+
+# Break and continue
+for i in {1..10}; do
+    [ $i -eq 5 ] && continue  # Skip iteration when i=5
+    [ $i -eq 8 ] && break     # Exit loop when i=8
+    echo $i
+done
+```
+
+## Functions
+
+```bash
+# Declaring functions
+function greet() {
+    echo "Hello, $1!"
+}
+
+# Alternate syntax
+welcome() {
+    local name=$1  # local variable
+    echo "Welcome, $name!"
+}
+
+# Calling functions
+greet "World"
+welcome "John"
+
+# Return values
+get_sum() {
+    local a=$1
+    local b=$2
+    echo $((a + b))  # return via stdout
+    return 0  # return status (0-255)
+}
+
+# Capturing function output
+sum=$(get_sum 5 3)
+echo "Sum is $sum"
+```
+
+## Arrays
+
+```bash
+# Declaring arrays
+fruits=("Apple" "Banana" "Cherry")
+numbers=(1 2 3 4 5)
+
+# Associative arrays (dictionaries, Bash 4+)
+declare -A user_info
+user_info[name]="John"
+user_info[age]=30
+
+# Accessing elements
+echo ${fruits[0]}                # First element
+echo ${fruits[-1]}               # Last element
+echo ${fruits[@]}                # All elements
+echo ${#fruits[@]}               # Array length
+echo ${!fruits[@]}               # All indices
+
+# Slicing arrays
+echo ${fruits[@]:1:2}            # Elements 1 to 2
+
+# Looping through arrays
+for fruit in "${fruits[@]}"; do
+    echo "Fruit: $fruit"
+done
+
+# Looping through associative arrays
+for key in "${!user_info[@]}"; do
+    echo "$key: ${user_info[$key]}"
+done
+```
+
+## String Operations
+
+```bash
+string="Hello World"
+
+# Length
+echo ${#string}                  # 11
+
+# Substring
+echo ${string:6}                 # World
+echo ${string:0:5}               # Hello
+
+# Replacement
+echo ${string/World/Universe}    # Hello Universe (first occurrence)
+echo ${string//o/O}              # HellO WOrld (all occurrences)
+
+# Case modification
+echo ${string^}                  # Hello World (capitalize first letter)
+echo ${string^^}                 # HELLO WORLD (all uppercase)
+echo ${string,}                  # hello World (lowercase first letter)
+echo ${string,,}                 # hello world (all lowercase)
+
+# Strip prefix/suffix
+echo ${string#He}                # llo World (remove prefix)
+echo ${string##*o}               # rld (remove longest prefix match)
+echo ${string%ld}                # Hello Wor (remove suffix)
+echo ${string%%or*}              # Hello W (remove longest suffix match)
+```
+
+## Parameter Expansion
+
+```bash
+# Default values
+echo ${var:-default}             # Use default if var is unset or null
+echo ${var:=default}             # Assign default if var is unset or null
+echo ${var:+alternate}           # Use alternate if var is set and not null
+echo ${var:?error}               # Display error if var is unset or null
+
+# Variable indirection
+name="value"
+ref="name"
+echo ${!ref}                     # Prints "value"
+```
+
+## Advanced Command Execution
+
+```bash
+# Subshells
+(cd /tmp && ls)                  # Current directory unchanged
+
+# Process substitution
+diff <(ls dir1) <(ls dir2)       # Compare outputs
+while read line; do
+    echo "Line: $line"
+done < <(grep pattern file)
+
+# Backgrounding and job control
+command &                        # Run in background
+wait                             # Wait for all background jobs
+wait $pid                        # Wait for specific job
+
+# Traps (signal handling)
+trap "echo 'Ctrl+C pressed'; exit" SIGINT
+trap "rm -f $temp_file; exit" EXIT
+
+# Timeout
+timeout 5s command               # Run with 5-second timeout
+```
+
+## Advanced I/O and Redirection
+
+```bash
+# Here documents (multiline strings)
+cat << EOF > output.txt
+This is line 1
+This is line 2
+Variables like $HOME are expanded
+EOF
+
+# Here strings (single-line input)
+grep "pattern" <<< "$string"
+
+# Process substitution
+diff <(sort file1) <(sort file2)
+
+# Redirecting specific file descriptors
+command 2>&1                     # Redirect stderr to stdout
+command &>/dev/null              # Redirect both stdout and stderr to /dev/null
+exec 3>logfile                   # Open file descriptor 3 for writing
+echo "log entry" >&3             # Write to file descriptor 3
+exec 3>&-                        # Close file descriptor 3
+```
+
+## Script Options and Arguments
+
+```bash
+# Command-line arguments
+echo "Script name: $0"
+echo "First argument: $1"
+echo "All arguments: $@"
+echo "Number of arguments: $#"
+
+# Shift arguments
+shift                            # Removes $1
+shift 2                          # Removes $1 and $2
+
+# Getopts for option parsing
+while getopts ":a:b:c" opt; do
+    case $opt in
+        a) a_arg="$OPTARG" ;;
+        b) b_arg="$OPTARG" ;;
+        c) c_flag=true ;;
+        \?) echo "Invalid option: -$OPTARG" >&2; exit 1 ;;
+        :) echo "Option -$OPTARG requires an argument" >&2; exit 1 ;;
+    esac
+done
+shift $((OPTIND-1))              # Remove processed options
+```
+
+## Error Handling
+
+```bash
+# Exit on error
+set -e                           # Exit if any command fails
+set -u                           # Exit if undefined variable is used
+set -o pipefail                  # Exit if any command in pipeline fails
+set -x                           # Print each command before execution (debugging)
+
+# Error handling function
+handle_error() {
+    local line_no=$1
+    local exit_code=$2
+    echo "Error on line $line_no, exit code $exit_code" >&2
+    exit $exit_code
+}
+trap 'handle_error $LINENO $?' ERR
+
+# Check command success
+if ! command; then
+    echo "Command failed" >&2
+    exit 1
+fi
+```
+
+## Debugging Tips
+
+```bash
+# Enable debugging mode
+bash -x script.sh                # Run with debugging
+set -x                           # Enable debugging
+set +x                           # Disable debugging
+
+# Debug specific sections
+set -x
+commands_to_debug
+set +x
+
+# Check script syntax without executing
+bash -n script.sh
+```
+
+## Best Practices
+
+1. **Always validate input**
+   ```bash
+   if [[ -z "$input" ]]; then
+       echo "Error: Input cannot be empty" >&2
+       exit 1
+   fi
+   ```
+
+2. **Use meaningful variable names**
+   ```bash
+   # Good
+   user_name="John"
+   
+   # Bad
+   u="John"
+   ```
+
+3. **Comment your code**
+   ```bash
+   # Calculate age from birth year
+   age=$((current_year - birth_year))
+   ```
+
+4. **Use functions for repeated tasks**
+   ```bash
+   check_file_exists() {
+       if [[ ! -f "$1" ]]; then
+           echo "Error: File $1 does not exist" >&2
+           return 1
+       fi
+       return 0
+   }
+   ```
+
+5. **Use proper exit codes**
+   ```bash
+   # 0: Success
+   # 1-255: Various error conditions
+   exit 0  # Successful execution
+   exit 1  # General error
+   ```
+
+6. **Quote variables**
+   ```bash
+   # Good
+   file_name="My Document.txt"
+   rm "$file_name"
+   
+   # Bad (breaks with spaces)
+   rm $file_name
+   ```
+
+7. **Use shellcheck for script validation**
+   ```bash
+   shellcheck script.sh
+   ```
+
+8. **Create temporary files safely**
+   ```bash
+   temp_file=$(mktemp)
+   trap "rm -f $temp_file" EXIT
+   ```
+
+9. **Avoid unnecessary subshells**
+   ```bash
+   # Good
+   count=$(wc -l < file.txt)
+   
+   # Less efficient
+   count=$(cat file.txt | wc -l)
+   ```
+
+10. **Handle script termination**
+    ```bash
+    cleanup() {
+        # Remove temp files, close connections, etc.
+        rm -f "$temp_file"
+        echo "Cleanup complete"
+    }
+    trap cleanup EXIT
+    ```
+

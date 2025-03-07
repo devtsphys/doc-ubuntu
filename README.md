@@ -1,5 +1,8 @@
 # Ubuntu & Shell Scripting Reference Card
 
+- [Basic Terminal Navigation](#basic-terminal-navigation)
+- [File Permisssions](#file-permissions)
+
 ## Basic Terminal Navigation
 
 | Command | Description | Examples |
